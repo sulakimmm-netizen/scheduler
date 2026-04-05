@@ -141,7 +141,7 @@ function TaskItem({
 
       {/* Card content */}
       <div
-        className="relative flex items-start gap-2.5 px-4 py-4 min-h-[44px] bg-gray-100 rounded-lg transition-transform"
+        className="relative flex items-start px-4 py-4 min-h-[44px] bg-gray-100 rounded-lg transition-transform"
         style={{
           transform: `translateX(${swipeX}px)`,
           transition: swiping ? "none" : "transform 0.2s ease-out",
@@ -152,25 +152,7 @@ function TaskItem({
           }
         }}
       >
-        {checked && (
-          <div className="absolute inset-y-0 right-0 flex items-start z-10 rounded-r-lg overflow-hidden">
-            <div
-              className="h-full flex items-start pt-5 pr-5 pl-16"
-              style={{
-                background: "linear-gradient(to right, rgb(243 244 246 / 0.4), rgb(243 244 246) 50%)",
-              }}
-            >
-              <span className="text-sm font-bold text-gray-900">완료</span>
-            </div>
-          </div>
-        )}
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={toggle}
-          className="w-6 h-6 rounded-full border-2 border-gray-300 text-gray-900 focus:ring-gray-900 focus:ring-offset-0 cursor-pointer shrink-0 z-20"
-        />
-        <div className="flex flex-col gap-1.5 flex-1 min-w-0 -mt-px">
+        <div className="flex flex-col gap-1.5 flex-1 min-w-0">
           <div className={checked ? "opacity-15" : ""}>
             {task.start_time && task.end_time ? (
               <span className="inline-flex items-center justify-center px-2 h-[24px] rounded-md text-xs font-medium bg-gray-900 text-white shrink-0 whitespace-nowrap">
@@ -198,16 +180,26 @@ function TaskItem({
                 className="w-full text-sm px-1 py-0.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-900"
               />
             ) : (
-              <button
-                onClick={() => setEditing(true)}
-                className={`text-sm text-left transition-colors ${
+              <span
+                className={`text-sm transition-colors ${
                   checked ? "text-black opacity-20" : "text-black"
                 }`}
               >
                 {task.title}
-              </button>
+              </span>
             )}
           </div>
+        </div>
+        <div className="flex items-center gap-2 ml-3 shrink-0 mt-px">
+          {checked && (
+            <span className="text-sm font-bold text-gray-900">완료</span>
+          )}
+          <input
+            type="checkbox"
+            checked={checked}
+            onChange={toggle}
+            className="w-6 h-6 rounded-full border-2 border-gray-300 text-gray-900 focus:ring-gray-900 focus:ring-offset-0 cursor-pointer shrink-0"
+          />
         </div>
       </div>
     </div>
@@ -229,26 +221,8 @@ function RoutineItem({
 
   return (
     <div className="relative overflow-hidden rounded-lg">
-      <div className="relative flex items-start gap-2.5 px-4 py-4 min-h-[44px] bg-gray-100 rounded-lg">
-        {checked && (
-          <div className="absolute inset-y-0 right-0 flex items-start z-10 rounded-r-lg overflow-hidden">
-            <div
-              className="h-full flex items-start pt-5 pr-5 pl-16"
-              style={{
-                background: "linear-gradient(to right, rgb(243 244 246 / 0.4), rgb(243 244 246) 50%)",
-              }}
-            >
-              <span className="text-sm font-bold text-gray-900">완료</span>
-            </div>
-          </div>
-        )}
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={toggle}
-          className="w-6 h-6 rounded-full border-2 border-gray-300 text-gray-900 focus:ring-gray-900 focus:ring-offset-0 cursor-pointer shrink-0 z-20"
-        />
-        <div className="flex flex-col gap-1.5 flex-1 min-w-0 -mt-px">
+      <div className="relative flex items-start px-4 py-4 min-h-[44px] bg-gray-100 rounded-lg">
+        <div className="flex flex-col gap-1.5 flex-1 min-w-0">
           <div className={checked ? "opacity-15" : ""}>
             <TimeBlockBadge hours={routine.time_block_hours} />
           </div>
@@ -259,6 +233,17 @@ function RoutineItem({
           >
             {routine.title}
           </span>
+        </div>
+        <div className="flex items-center gap-2 ml-3 shrink-0 mt-px">
+          {checked && (
+            <span className="text-sm font-bold text-gray-900">완료</span>
+          )}
+          <input
+            type="checkbox"
+            checked={checked}
+            onChange={toggle}
+            className="w-6 h-6 rounded-full border-2 border-gray-300 text-gray-900 focus:ring-gray-900 focus:ring-offset-0 cursor-pointer shrink-0"
+          />
         </div>
       </div>
     </div>
