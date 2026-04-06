@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { formatDateKo, getToday, offsetDay } from "@/lib/utils";
+import { formatDateKo, formatDateShort, getToday, offsetDay } from "@/lib/utils";
 
 export function DateNavigator() {
   const router = useRouter();
@@ -54,9 +54,9 @@ export function DateNavigator() {
             const qs = params.toString();
             router.push(qs ? `${pathname}?${qs}` : pathname);
           }}
-          className="text-xs text-pink-500 font-medium ml-1 absolute right-4"
+          className="text-xs text-gray-400 font-medium ml-1 absolute right-4"
         >
-          오늘
+          오늘날짜로
         </button>
       )}
     </div>
