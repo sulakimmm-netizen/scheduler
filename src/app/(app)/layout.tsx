@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AuthGate } from "@/components/auth-gate";
 import { ViewTabs } from "@/components/view-tabs";
 import { DateNavigator } from "@/components/date-navigator";
+import { SearchBar } from "@/components/search-bar";
 import { LogoutButton } from "@/components/logout-button";
 
 export default async function AppLayout({
@@ -31,6 +32,9 @@ export default async function AppLayout({
           <div className="mb-3 relative">
             <DateNavigator />
           </div>
+        </div>
+        <div className="max-w-2xl mx-auto px-4 pb-3">
+          <SearchBar />
         </div>
         <ViewTabs />
       </header>
