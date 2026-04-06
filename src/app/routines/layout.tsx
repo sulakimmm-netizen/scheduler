@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { AuthGate } from "@/components/auth-gate";
-import { SearchBar } from "@/components/search-bar";
 
 export default async function RoutinesLayout({
   children,
@@ -38,9 +37,6 @@ export default async function RoutinesLayout({
             </a>
             <h1 className="text-lg font-bold text-gray-900">루틴 관리</h1>
           </div>
-        </div>
-        <div className="max-w-2xl mx-auto px-4 pb-3">
-          <SearchBar />
         </div>
       </header>
       <main className="max-w-2xl mx-auto px-4 pt-2 pb-24">{children}</main>

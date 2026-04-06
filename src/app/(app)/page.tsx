@@ -7,7 +7,7 @@ import { getToday, getDayOfWeek } from "@/lib/utils";
 export default async function TodayPage({
   searchParams,
 }: {
-  searchParams: Promise<{ date?: string; q?: string }>;
+  searchParams: Promise<{ date?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -16,10 +16,9 @@ export default async function TodayPage({
 
   if (!user) return null;
 
-  const { date: dateParam, q } = await searchParams;
+  const { date: dateParam } = await searchParams;
   const date = dateParam ?? getToday();
   const dayOfWeek = getDayOfWeek(date);
-  const query = q?.toLowerCase() ?? "";
 
   const [routines, tasks, completions] = await Promise.all([
     getRoutinesForDay(user.id, dayOfWeek),
@@ -27,16 +26,9 @@ export default async function TodayPage({
     getCompletionsForDate(user.id, date),
   ]);
 
-  const filteredRoutines = query
-    ? routines.filter((r) => r.title.toLowerCase().includes(query))
-    : routines;
-  const filteredTasks = query
-    ? tasks.filter((t) => t.title.toLowerCase().includes(query))
-    : tasks;
-
   return (
     <div>
-      <TaskList tasks={filteredTasks} routines={filteredRoutines} completions={completions} date={date} />
+      <TaskList tasks={tasks} routines={routines} completions={completions} date={date} />
       <AddTaskForm date={date} />
     </div>
   );

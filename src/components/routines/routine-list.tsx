@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { deleteRoutine } from "@/lib/actions";
 import { RoutineForm } from "./routine-form";
 import { DAYS_KO, formatTimeBlock } from "@/lib/utils";
@@ -69,15 +68,10 @@ function RoutineItem({ routine }: { routine: DailyRoutine }) {
 
 export function RoutineList({ routines }: { routines: DailyRoutine[] }) {
   const [adding, setAdding] = useState(false);
-  const searchParams = useSearchParams();
-  const query = searchParams.get("q")?.toLowerCase() ?? "";
-  const filtered = query
-    ? routines.filter((r) => r.title.toLowerCase().includes(query))
-    : routines;
 
   return (
     <>
-      {filtered.length === 0 ? (
+      {routines.length === 0 ? (
         <div
           className="flex items-center justify-center"
           style={{ minHeight: "calc(100vh - 200px)" }}
@@ -86,7 +80,7 @@ export function RoutineList({ routines }: { routines: DailyRoutine[] }) {
         </div>
       ) : (
         <div className="divide-y divide-gray-100">
-          {filtered.map((routine) => (
+          {routines.map((routine) => (
             <RoutineItem key={routine.id} routine={routine} />
           ))}
         </div>
