@@ -3,21 +3,21 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-// === Auth Helpers ===
+// === Auth Helper — returns both client & userId to avoid double createClient() ===
 
-async function getAuthUserId(): Promise<string> {
+async function getAuthClient() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
-  return user.id;
+  return { supabase, userId: user.id };
 }
 
 // === Routine Actions ===
 
 export async function createRoutine(formData: FormData) {
-  const userId = await getAuthUserId();
+  const { supabase, userId } = await getAuthClient();
   const title = formData.get("title") as string;
   const daysStr = formData.get("days_of_week") as string;
   const days = daysStr ? JSON.parse(daysStr) as number[] : [];
@@ -26,7 +26,6 @@ export async function createRoutine(formData: FormData) {
 
   if (!title?.trim()) return;
 
-  const supabase = await createClient();
   await supabase.from("daily_routines").insert({
     user_id: userId,
     title: title.trim(),
@@ -34,20 +33,18 @@ export async function createRoutine(formData: FormData) {
     time_block_hours: timeBlockHours,
   });
 
-  revalidatePath("/");
   revalidatePath("/routines");
-  revalidatePath("/week");
+  revalidatePath("/");
 }
 
 export async function updateRoutine(id: string, formData: FormData) {
-  const userId = await getAuthUserId();
+  const { supabase, userId } = await getAuthClient();
   const title = formData.get("title") as string;
   const daysStr = formData.get("days_of_week") as string;
   const days = daysStr ? JSON.parse(daysStr) as number[] : [];
   const timeBlockStr = formData.get("time_block_hours") as string;
   const timeBlockHours = timeBlockStr ? parseFloat(timeBlockStr) : null;
 
-  const supabase = await createClient();
   const { error } = await supabase
     .from("daily_routines")
     .update({ title: title.trim(), days_of_week: days, time_block_hours: timeBlockHours })
@@ -59,29 +56,26 @@ export async function updateRoutine(id: string, formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/");
   revalidatePath("/routines");
-  revalidatePath("/week");
+  revalidatePath("/");
 }
 
 export async function deleteRoutine(id: string) {
-  const userId = await getAuthUserId();
-  const supabase = await createClient();
+  const { supabase, userId } = await getAuthClient();
   await supabase
     .from("daily_routines")
     .update({ is_active: false })
     .eq("id", id)
     .eq("user_id", userId);
 
-  revalidatePath("/");
   revalidatePath("/routines");
-  revalidatePath("/week");
+  revalidatePath("/");
 }
 
 // === Task Actions ===
 
 export async function createTask(formData: FormData) {
-  const userId = await getAuthUserId();
+  const { supabase, userId } = await getAuthClient();
   const title = formData.get("title") as string;
   const date = formData.get("date") as string;
   const timeBlockStr = formData.get("time_block_hours") as string;
@@ -91,7 +85,6 @@ export async function createTask(formData: FormData) {
 
   if (!title?.trim() || !date) return;
 
-  const supabase = await createClient();
   await supabase.from("daily_tasks").insert({
     user_id: userId,
     title: title.trim(),
@@ -102,16 +95,14 @@ export async function createTask(formData: FormData) {
   });
 
   revalidatePath("/");
-  revalidatePath("/week");
 }
 
 export async function updateTask(id: string, formData: FormData) {
-  const userId = await getAuthUserId();
+  const { supabase, userId } = await getAuthClient();
   const title = formData.get("title") as string;
   const timeBlockStr = formData.get("time_block_hours") as string;
   const timeBlockHours = timeBlockStr ? parseFloat(timeBlockStr) : null;
 
-  const supabase = await createClient();
   await supabase
     .from("daily_tasks")
     .update({
@@ -122,12 +113,10 @@ export async function updateTask(id: string, formData: FormData) {
     .eq("user_id", userId);
 
   revalidatePath("/");
-  revalidatePath("/week");
 }
 
 export async function deleteTask(id: string) {
-  const userId = await getAuthUserId();
-  const supabase = await createClient();
+  const { supabase, userId } = await getAuthClient();
   await supabase
     .from("daily_tasks")
     .delete()
@@ -135,12 +124,10 @@ export async function deleteTask(id: string) {
     .eq("user_id", userId);
 
   revalidatePath("/");
-  revalidatePath("/week");
 }
 
 export async function reorderTasks(orderedIds: string[]) {
-  const userId = await getAuthUserId();
-  const supabase = await createClient();
+  const { supabase, userId } = await getAuthClient();
 
   const updates = orderedIds.map((id, index) =>
     supabase
@@ -152,7 +139,6 @@ export async function reorderTasks(orderedIds: string[]) {
   await Promise.all(updates);
 
   revalidatePath("/");
-  revalidatePath("/week");
 }
 
 // === Completion Actions ===
@@ -162,11 +148,9 @@ export async function toggleRoutineCompletion(
   date: string,
   currentState: boolean
 ) {
-  const userId = await getAuthUserId();
-  const supabase = await createClient();
+  const { supabase, userId } = await getAuthClient();
 
   if (currentState) {
-    // Uncheck: delete the completion record
     await supabase
       .from("routine_completions")
       .delete()
@@ -174,7 +158,6 @@ export async function toggleRoutineCompletion(
       .eq("date", date)
       .eq("user_id", userId);
   } else {
-    // Check: upsert a completion record
     await supabase.from("routine_completions").upsert(
       {
         routine_id: routineId,
@@ -187,15 +170,13 @@ export async function toggleRoutineCompletion(
   }
 
   revalidatePath("/");
-  revalidatePath("/week");
 }
 
 export async function toggleTaskCompletion(
   taskId: string,
   currentState: boolean
 ) {
-  const userId = await getAuthUserId();
-  const supabase = await createClient();
+  const { supabase, userId } = await getAuthClient();
 
   await supabase
     .from("daily_tasks")
@@ -204,5 +185,4 @@ export async function toggleTaskCompletion(
     .eq("user_id", userId);
 
   revalidatePath("/");
-  revalidatePath("/week");
 }
