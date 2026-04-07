@@ -66,7 +66,13 @@ function RoutineItem({ routine }: { routine: DailyRoutine }) {
   );
 }
 
-export function RoutineList({ routines }: { routines: DailyRoutine[] }) {
+export function RoutineList({
+  routines,
+  inModal,
+}: {
+  routines: DailyRoutine[];
+  inModal?: boolean;
+}) {
   const [adding, setAdding] = useState(false);
 
   return (
@@ -74,7 +80,7 @@ export function RoutineList({ routines }: { routines: DailyRoutine[] }) {
       {routines.length === 0 ? (
         <div
           className="flex items-center justify-center"
-          style={{ minHeight: "calc(100vh - 200px)" }}
+          style={inModal ? { minHeight: "200px" } : { minHeight: "calc(100vh - 200px)" }}
         >
           <p className="text-sm text-gray-400">등록된 루틴이 없습니다</p>
         </div>
@@ -87,8 +93,8 @@ export function RoutineList({ routines }: { routines: DailyRoutine[] }) {
       )}
 
       {/* 하단 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white">
-        <div className="max-w-2xl mx-auto">
+      {inModal ? (
+        <div className="sticky bottom-0 py-3 bg-white">
           <button
             onClick={() => setAdding(true)}
             className="w-full h-[48px] text-sm font-medium bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center"
@@ -96,16 +102,29 @@ export function RoutineList({ routines }: { routines: DailyRoutine[] }) {
             + 새 루틴 만들기
           </button>
         </div>
-      </div>
+      ) : (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white">
+          <div className="max-w-2xl mx-auto">
+            <button
+              onClick={() => setAdding(true)}
+              className="w-full h-[48px] text-sm font-medium bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center"
+            >
+              + 새 루틴 만들기
+            </button>
+          </div>
+        </div>
+      )}
 
-      {/* 모달 */}
+      {/* 루틴 추가 모달 */}
       {adding && (
         <>
           <div
-            className="fixed inset-0 bg-black/30 z-40"
+            className={`fixed inset-0 bg-black/30 ${inModal ? "z-[60]" : "z-40"}`}
             onClick={() => setAdding(false)}
           />
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-lg">
+          <div
+            className={`fixed bottom-0 left-0 right-0 ${inModal ? "z-[70]" : "z-50"} bg-white rounded-t-2xl shadow-lg`}
+          >
             <div className="max-w-2xl mx-auto px-4 pt-4 pb-4">
               <RoutineForm onClose={() => setAdding(false)} />
             </div>

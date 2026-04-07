@@ -102,12 +102,16 @@ export async function updateTask(id: string, formData: FormData) {
   const title = formData.get("title") as string;
   const timeBlockStr = formData.get("time_block_hours") as string;
   const timeBlockHours = timeBlockStr ? parseFloat(timeBlockStr) : null;
+  const startTime = (formData.get("start_time") as string) || null;
+  const endTime = (formData.get("end_time") as string) || null;
 
   await supabase
     .from("daily_tasks")
     .update({
       title: title.trim(),
       time_block_hours: timeBlockHours,
+      start_time: startTime,
+      end_time: endTime,
     })
     .eq("id", id)
     .eq("user_id", userId);

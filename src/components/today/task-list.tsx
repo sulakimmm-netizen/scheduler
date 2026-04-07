@@ -5,30 +5,24 @@ import {
   toggleTaskCompletion,
   toggleRoutineCompletion,
   deleteTask,
-  updateTask,
   reorderTasks,
 } from "@/lib/actions";
 import { useOptimisticToggle } from "@/hooks/use-optimistic-toggle";
 import { TimeBlockBadge } from "@/components/ui/time-block-badge";
+import { TaskFormModal } from "./task-form-modal";
 import type { DailyTask, DailyRoutine, RoutineCompletion } from "@/lib/types";
 
 function TaskItem({
   task,
   onDragStart,
-  onDragOver,
-  onDragEnd,
   isDragging,
-  isDragOver,
+  onEdit,
 }: {
   task: DailyTask;
   onDragStart: () => void;
-  onDragOver: () => void;
-  onDragEnd: () => void;
   isDragging: boolean;
-  isDragOver: boolean;
+  onEdit: () => void;
 }) {
-  const [editing, setEditing] = useState(false);
-  const [title, setTitle] = useState(task.title);
   const [swipeX, setSwipeX] = useState(0);
   const [swiping, setSwiping] = useState(false);
   const touchStartX = useRef(0);
@@ -43,16 +37,8 @@ function TaskItem({
     }
   );
 
-  async function handleSave() {
-    if (title.trim() && title !== task.title) {
-      const fd = new FormData();
-      fd.set("title", title);
-      if (task.time_block_hours !== null) {
-        fd.set("time_block_hours", String(task.time_block_hours));
-      }
-      await updateTask(task.id, fd);
-    }
-    setEditing(false);
+  async function handleDelete() {
+    await deleteTask(task.id);
   }
 
   function handleTouchStart(e: React.TouchEvent) {
@@ -82,14 +68,14 @@ function TaskItem({
     }
 
     if (isLongPress.current) {
-      // Reorder mode - handle drag over detection via parent
+      // Drag mode - let parent handle via bubbling
       return;
     }
 
     // Swipe detection (only left swipe)
     if (Math.abs(dx) > Math.abs(dy) && dx < -10) {
       setSwiping(true);
-      setSwipeX(Math.max(dx, -100));
+      setSwipeX(Math.max(dx, -160));
     }
   }
 
@@ -101,14 +87,12 @@ function TaskItem({
 
     if (isLongPress.current) {
       isLongPress.current = false;
-      onDragEnd();
       return;
     }
 
     if (swiping) {
       if (swipeX < -60) {
-        // Keep delete button visible
-        setSwipeX(-80);
+        setSwipeX(-140);
       } else {
         setSwipeX(0);
       }
@@ -116,30 +100,35 @@ function TaskItem({
     }
   }
 
-  async function handleDelete() {
-    await deleteTask(task.id);
-  }
-
   return (
     <div
-      className={`relative overflow-hidden rounded-lg transition-shadow ${
-        isDragging ? "opacity-50" : ""
-      } ${isDragOver ? "ring-2 ring-pink-300" : ""}`}
+      className={`relative overflow-hidden rounded-lg transition-all duration-200 ${
+        isDragging ? "opacity-50 scale-[1.03] shadow-lg z-10" : ""
+      }`}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Delete button behind */}
+      {/* 스와이프 뒤 버튼 (수정 + 삭제) */}
       <div className="absolute inset-y-0 right-0 flex items-center">
         <button
+          onClick={() => {
+            setSwipeX(0);
+            onEdit();
+          }}
+          className="h-full w-[70px] bg-gray-500 text-white text-sm font-medium"
+        >
+          수정
+        </button>
+        <button
           onClick={handleDelete}
-          className="h-full px-6 bg-red-500 text-white text-sm font-medium"
+          className="h-full w-[70px] bg-red-500 text-white text-sm font-medium"
         >
           삭제
         </button>
       </div>
 
-      {/* Card content */}
+      {/* 카드 내용 */}
       <div
         className="relative flex items-start px-4 py-4 min-h-[44px] bg-gray-100 rounded-lg transition-transform"
         style={{
@@ -162,33 +151,13 @@ function TaskItem({
               <TimeBlockBadge hours={task.time_block_hours} />
             )}
           </div>
-          <div className="flex-1 min-w-0">
-            {editing ? (
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                onBlur={handleSave}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSave();
-                  if (e.key === "Escape") {
-                    setTitle(task.title);
-                    setEditing(false);
-                  }
-                }}
-                autoFocus
-                className="w-full text-sm px-1 py-0.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-900"
-              />
-            ) : (
-              <span
-                className={`text-sm transition-colors ${
-                  checked ? "text-black opacity-20" : "text-black"
-                }`}
-              >
-                {task.title}
-              </span>
-            )}
-          </div>
+          <span
+            className={`text-sm transition-colors ${
+              checked ? "text-black opacity-20" : "text-black"
+            }`}
+          >
+            {task.title}
+          </span>
         </div>
         <div className="flex items-center gap-2 ml-3 shrink-0 mt-px">
           {checked && (
@@ -263,7 +232,7 @@ export function TaskList({
 }) {
   const [items, setItems] = useState(tasks);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [editingTask, setEditingTask] = useState<DailyTask | null>(null);
 
   // Sync with server data
   const prevTasksRef = useRef(tasks);
@@ -276,41 +245,38 @@ export function TaskList({
     setDragIndex(index);
   }, []);
 
-  const handleDragOver = useCallback(
-    (index: number) => {
-      if (dragIndex === null || dragIndex === index) return;
-      setDragOverIndex(index);
+  function handleListTouchMove(e: React.TouchEvent) {
+    if (dragIndex === null) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const wrapper = el?.closest("[data-task-index]");
+    if (wrapper) {
+      const overIndex = Number(wrapper.getAttribute("data-task-index"));
+      if (overIndex !== dragIndex && !isNaN(overIndex)) {
+        setItems((prev) => {
+          const next = [...prev];
+          const [moved] = next.splice(dragIndex, 1);
+          next.splice(overIndex, 0, moved);
+          return next;
+        });
+        setDragIndex(overIndex);
+      }
+    }
+  }
 
-      // Reorder
-      setItems((prev) => {
-        const next = [...prev];
-        const [moved] = next.splice(dragIndex, 1);
-        next.splice(index, 0, moved);
-        return next;
-      });
-      setDragIndex(index);
-    },
-    [dragIndex]
-  );
-
-  const handleDragEnd = useCallback(async () => {
-    setDragIndex(null);
-    setDragOverIndex(null);
-    // Save new order
-    const orderedIds = items.map((t) => t.id);
-    await reorderTasks(orderedIds);
-  }, [items]);
+  function handleListTouchEnd() {
+    if (dragIndex !== null) {
+      const orderedIds = items.map((t) => t.id);
+      setDragIndex(null);
+      reorderTasks(orderedIds);
+    }
+  }
 
   return (
     <section>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-medium text-gray-700">할 일</h2>
-        <a
-          href="/routines"
-          className="text-sm font-medium text-pink-500 hover:text-pink-600 transition-colors"
-        >
-          루틴 관리
-        </a>
       </div>
       {routines.length === 0 && items.length === 0 ? (
         <div
@@ -324,7 +290,6 @@ export function TaskList({
           completions.map((c) => [c.routine_id, c.is_completed])
         );
 
-        // Build unified list: uncompleted routines, uncompleted tasks, completed routines, completed tasks
         const uncompleted: React.ReactNode[] = [];
         const completed: React.ReactNode[] = [];
 
@@ -344,27 +309,40 @@ export function TaskList({
 
         items.forEach((task, index) => {
           const node = (
-            <TaskItem
-              key={task.id}
-              task={task}
-              onDragStart={() => handleDragStart(index)}
-              onDragOver={() => handleDragOver(index)}
-              onDragEnd={handleDragEnd}
-              isDragging={dragIndex === index}
-              isDragOver={dragOverIndex === index}
-            />
+            <div key={task.id} data-task-index={index}>
+              <TaskItem
+                task={task}
+                onDragStart={() => handleDragStart(index)}
+                isDragging={dragIndex === index}
+                onEdit={() => setEditingTask(task)}
+              />
+            </div>
           );
           if (task.is_completed) completed.push(node);
           else uncompleted.push(node);
         });
 
         return (
-          <div className="flex flex-col gap-2">
+          <div
+            className="flex flex-col gap-2"
+            style={{ touchAction: dragIndex !== null ? "none" : "auto" }}
+            onTouchMove={handleListTouchMove}
+            onTouchEnd={handleListTouchEnd}
+          >
             {uncompleted}
             {completed}
           </div>
         );
       })()}
+
+      {/* 수정 모달 */}
+      {editingTask && (
+        <TaskFormModal
+          date={date}
+          task={editingTask}
+          onClose={() => setEditingTask(null)}
+        />
+      )}
     </section>
   );
 }

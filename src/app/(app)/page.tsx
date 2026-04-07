@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getRoutinesForDay, getTasksForDate, getCompletionsForDate } from "@/lib/queries";
+import { getRoutinesForDay, getTasksForDate, getCompletionsForDate, getAllRoutines } from "@/lib/queries";
 import { TaskList } from "@/components/today/task-list";
 import { AddTaskForm } from "@/components/today/add-task-form";
 import { getToday, getDayOfWeek } from "@/lib/utils";
@@ -20,16 +20,17 @@ export default async function TodayPage({
   const date = dateParam ?? getToday();
   const dayOfWeek = getDayOfWeek(date);
 
-  const [routines, tasks, completions] = await Promise.all([
+  const [routines, tasks, completions, allRoutines] = await Promise.all([
     getRoutinesForDay(user.id, dayOfWeek),
     getTasksForDate(user.id, date),
     getCompletionsForDate(user.id, date),
+    getAllRoutines(user.id),
   ]);
 
   return (
     <div>
       <TaskList tasks={tasks} routines={routines} completions={completions} date={date} />
-      <AddTaskForm date={date} />
+      <AddTaskForm date={date} allRoutines={allRoutines} />
     </div>
   );
 }
