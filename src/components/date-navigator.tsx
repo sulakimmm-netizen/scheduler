@@ -25,27 +25,29 @@ export function DateNavigator() {
 
   return (
     <div className="flex items-center justify-center w-full">
-      <button
-        onClick={() => navigateDay(-1)}
-        className="p-1 text-gray-400 hover:text-gray-900 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-        aria-label="이전 날"
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
-          <path d="M12 4 L6 10 L12 16" />
-        </svg>
-      </button>
-      <h1 className="text-lg font-bold text-gray-900 mx-2">
-        {formatDateKo(currentDate)}
-      </h1>
-      <button
-        onClick={() => navigateDay(1)}
-        className="p-1 text-gray-400 hover:text-gray-900 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-        aria-label="다음 날"
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
-          <path d="M8 4 L14 10 L8 16" />
-        </svg>
-      </button>
+      <div className="flex items-center justify-center w-[220px]">
+        <button
+          onClick={() => navigateDay(-1)}
+          className="p-1 text-gray-400 hover:text-gray-900 transition-colors min-h-[44px] flex items-center justify-center"
+          aria-label="이전 날"
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+            <path d="M12 4 L6 10 L12 16" />
+          </svg>
+        </button>
+        <h1 className="text-lg font-bold text-gray-900 mx-1 whitespace-nowrap">
+          {formatDateKo(currentDate)}
+        </h1>
+        <button
+          onClick={() => navigateDay(1)}
+          className="p-1 text-gray-400 hover:text-gray-900 transition-colors min-h-[44px] flex items-center justify-center"
+          aria-label="다음 날"
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+            <path d="M8 4 L14 10 L8 16" />
+          </svg>
+        </button>
+      </div>
       {currentDate !== today && (
         <button
           onClick={() => {
