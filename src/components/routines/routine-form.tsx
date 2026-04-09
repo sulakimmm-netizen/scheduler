@@ -173,7 +173,7 @@ export function RoutineForm({
         <button
           type="button"
           onClick={onClose}
-          className="flex-1 h-[48px] text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="w-[112px] h-[48px] text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shrink-0"
         >
           취소
         </button>
