@@ -8,61 +8,83 @@ import type { DailyRoutine } from "@/lib/types";
 
 function RoutineItem({ routine }: { routine: DailyRoutine }) {
   const [editing, setEditing] = useState(false);
-  const [confirming, setConfirming] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   if (editing) {
     return <RoutineForm routine={routine} onClose={() => setEditing(false)} />;
   }
 
   return (
-    <div className="flex items-center justify-between py-3 min-h-[44px]">
-      <div className="flex-1 min-w-0">
-        <p className={`text-sm ${routine.is_active ? "text-gray-900" : "text-gray-400 line-through"}`}>
-          {routine.title}
-        </p>
-        <div className="flex items-center gap-1.5 mt-1">
-          {[...routine.days_of_week].sort((a, b) => ((a || 7) - (b || 7))).map((day) => (
-            <span
-              key={day}
-              className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded"
-            >
-              {DAYS_KO[day]}
-            </span>
-          ))}
-          {routine.time_block_hours != null && (
-            <span className="text-xs text-gray-500">
-              {formatTimeBlock(routine.time_block_hours)}
-            </span>
-          )}
+    <>
+      <div className="flex items-center justify-between py-3 min-h-[44px]">
+        <div className="flex-1 min-w-0">
+          <p className={`text-sm ${routine.is_active ? "text-gray-900" : "text-gray-400 line-through"}`}>
+            {routine.title}
+          </p>
+          <div className="flex items-center gap-1.5 mt-1">
+            {[...routine.days_of_week].sort((a, b) => ((a || 7) - (b || 7))).map((day) => (
+              <span
+                key={day}
+                className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded"
+              >
+                {DAYS_KO[day]}
+              </span>
+            ))}
+            {routine.time_block_hours != null && (
+              <span className="text-xs text-gray-500">
+                {formatTimeBlock(routine.time_block_hours)}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
-      <div className="flex gap-1">
-        <button
-          onClick={() => setEditing(true)}
-          className="text-sm text-gray-400 hover:text-gray-900 px-2 py-1 transition-colors"
-        >
-          수정
-        </button>
-        {confirming ? (
+        <div className="flex gap-1">
           <button
-            onClick={async () => {
-              await deleteRoutine(routine.id);
-              setConfirming(false);
-            }}
-            className="text-sm text-red-500 hover:text-red-700 px-2 py-1 transition-colors"
+            onClick={() => setEditing(true)}
+            className="text-sm text-gray-400 hover:text-gray-900 px-2 py-1 transition-colors"
           >
-            확인
+            수정
           </button>
-        ) : (
           <button
-            onClick={() => setConfirming(true)}
+            onClick={() => setShowDeleteModal(true)}
             className="text-sm text-gray-400 hover:text-red-500 px-2 py-1 transition-colors"
           >
             삭제
           </button>
-        )}
+        </div>
       </div>
-    </div>
+      {showDeleteModal && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/30 z-[80]"
+            onClick={() => setShowDeleteModal(false)}
+          />
+          <div className="fixed inset-0 z-[90] flex items-center justify-center px-8">
+            <div className="bg-white rounded-2xl w-full max-w-[280px] overflow-hidden shadow-lg">
+              <div className="px-6 pt-6 pb-4 text-center">
+                <p className="text-sm text-gray-900">삭제하시겠습니까?</p>
+              </div>
+              <div className="flex border-t border-gray-100">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="flex-1 py-3 text-sm text-gray-500 hover:bg-gray-50 transition-colors"
+                >
+                  취소하기
+                </button>
+                <button
+                  onClick={async () => {
+                    await deleteRoutine(routine.id);
+                    setShowDeleteModal(false);
+                  }}
+                  className="flex-1 py-3 text-sm text-red-500 font-medium hover:bg-red-50 transition-colors border-l border-gray-100"
+                >
+                  삭제하기
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </>
   );
 }
 
@@ -93,16 +115,7 @@ export function RoutineList({
       )}
 
       {/* 하단 버튼 */}
-      {inModal ? (
-        <div className="sticky bottom-0 py-3 bg-white">
-          <button
-            onClick={() => setAdding(true)}
-            className="w-full h-[48px] text-sm font-medium bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center"
-          >
-            + 새 루틴 만들기
-          </button>
-        </div>
-      ) : (
+      {!inModal && (
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white">
           <div className="max-w-2xl mx-auto">
             <button

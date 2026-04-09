@@ -202,7 +202,7 @@ export function TaskFormModal({
               type="submit"
               className="w-full h-[48px] text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
             >
-              {isEdit ? "수정 완료하기" : "추가하기"}
+              {isEdit ? "수정 완료하기" : "할 일 추가하기"}
             </button>
           </form>
         </div>

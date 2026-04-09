@@ -29,5 +29,6 @@ export interface RoutineCompletion {
   user_id: string;
   date: string; // YYYY-MM-DD
   is_completed: boolean;
+  is_skipped: boolean;
   updated_at: string;
 }

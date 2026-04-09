@@ -64,7 +64,7 @@ export async function deleteRoutine(id: string) {
   const { supabase, userId } = await getAuthClient();
   await supabase
     .from("daily_routines")
-    .update({ is_active: false })
+    .delete()
     .eq("id", id)
     .eq("user_id", userId);
 
@@ -141,6 +141,25 @@ export async function reorderTasks(orderedIds: string[]) {
       .eq("user_id", userId)
   );
   await Promise.all(updates);
+
+  revalidatePath("/");
+}
+
+// === Routine Skip (개별 날짜에서 루틴 건너뛰기) ===
+
+export async function skipRoutineForDate(routineId: string, date: string) {
+  const { supabase, userId } = await getAuthClient();
+
+  await supabase.from("routine_completions").upsert(
+    {
+      routine_id: routineId,
+      user_id: userId,
+      date,
+      is_completed: false,
+      is_skipped: true,
+    },
+    { onConflict: "routine_id,date" }
+  );
 
   revalidatePath("/");
 }

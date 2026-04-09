@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TaskFormModal } from "./task-form-modal";
 import { RoutineList } from "@/components/routines/routine-list";
+import { RoutineForm } from "@/components/routines/routine-form";
 import type { DailyRoutine } from "@/lib/types";
 
 export function AddTaskForm({
@@ -14,6 +15,7 @@ export function AddTaskForm({
 }) {
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [routineModalOpen, setRoutineModalOpen] = useState(false);
+  const [addingRoutine, setAddingRoutine] = useState(false);
 
   return (
     <>
@@ -22,15 +24,15 @@ export function AddTaskForm({
         <div className="max-w-2xl mx-auto flex gap-2">
           <button
             onClick={() => setRoutineModalOpen(true)}
-            className="w-[120px] h-[48px] text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors shrink-0"
+            className="w-[120px] h-[48px] text-sm font-medium bg-white text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shrink-0"
           >
-            루틴관리
+            루틴 관리
           </button>
           <button
             onClick={() => setTaskModalOpen(true)}
             className="flex-1 h-[48px] text-sm font-medium bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center"
           >
-            + 할 일 추가
+            할 일 추가
           </button>
         </div>
       </div>
@@ -64,7 +66,28 @@ export function AddTaskForm({
               <div className="flex-1 overflow-y-auto px-4">
                 <RoutineList routines={allRoutines} inModal />
               </div>
+              <div className="shrink-0 p-4 bg-white">
+                <button
+                  onClick={() => setAddingRoutine(true)}
+                  className="w-full h-[48px] text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center"
+                >
+                  새 루틴 만들기
+                </button>
+              </div>
             </div>
+            {addingRoutine && (
+              <>
+                <div
+                  className="fixed inset-0 bg-black/30 z-[60]"
+                  onClick={() => setAddingRoutine(false)}
+                />
+                <div className="fixed bottom-0 left-0 right-0 z-[70] bg-white rounded-t-2xl shadow-lg">
+                  <div className="max-w-2xl mx-auto px-4 pt-4 pb-4">
+                    <RoutineForm onClose={() => setAddingRoutine(false)} />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </>
       )}
