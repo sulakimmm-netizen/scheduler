@@ -24,7 +24,7 @@ export function AddTaskForm({
         <div className="max-w-2xl mx-auto flex gap-2">
           <button
             onClick={() => setRoutineModalOpen(true)}
-            className="w-[112px] h-[48px] text-sm font-medium bg-pink-50 text-pink-600 rounded-lg hover:bg-pink-100 transition-colors shrink-0"
+            className="w-[112px] h-[48px] text-sm font-medium bg-pink-100 text-pink-600 rounded-lg hover:bg-pink-200 transition-colors shrink-0"
           >
             루틴 관리
           </button>
