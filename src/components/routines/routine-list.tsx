@@ -122,7 +122,7 @@ export function RoutineList({
               onClick={() => setAdding(true)}
               className="w-full h-[48px] text-sm font-medium bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center"
             >
-              + 새 루틴 만들기
+              루틴 추가하기
             </button>
           </div>
         </div>

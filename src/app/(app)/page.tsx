@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getRoutinesForDay, getTasksForDate, getCompletionsForDate, getAllRoutines } from "@/lib/queries";
 import { TaskList } from "@/components/today/task-list";
 import { AddTaskForm } from "@/components/today/add-task-form";
+import { SwipeNavigator } from "@/components/swipe-navigator";
 import { getToday, getDayOfWeek } from "@/lib/utils";
 
 export default async function TodayPage({
@@ -28,9 +29,9 @@ export default async function TodayPage({
   ]);
 
   return (
-    <div>
+    <SwipeNavigator>
       <TaskList tasks={tasks} routines={routines} completions={completions} date={date} />
       <AddTaskForm date={date} allRoutines={allRoutines} />
-    </div>
+    </SwipeNavigator>
   );
 }
