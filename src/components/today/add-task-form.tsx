@@ -54,25 +54,27 @@ export function AddTaskForm({
             style={{ height: "640px" }}
           >
             <div className="max-w-2xl mx-auto h-full flex flex-col">
-              <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
+              <div className="flex items-center px-4 pt-4 pb-2 shrink-0">
                 <h2 className="text-base font-semibold">루틴 관리</h2>
-                <button
-                  onClick={() => setRoutineModalOpen(false)}
-                  className="text-sm text-gray-400 hover:text-gray-900 transition-colors"
-                >
-                  닫기
-                </button>
               </div>
               <div className="flex-1 overflow-y-auto px-4">
                 <RoutineList routines={allRoutines} inModal />
               </div>
               <div className="shrink-0 p-4 bg-white">
-                <button
-                  onClick={() => setAddingRoutine(true)}
-                  className="w-full h-[48px] text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center"
-                >
-                  루틴 추가하기
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setRoutineModalOpen(false)}
+                    className="w-[120px] h-[48px] text-sm font-medium bg-white text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shrink-0"
+                  >
+                    닫기
+                  </button>
+                  <button
+                    onClick={() => setAddingRoutine(true)}
+                    className="flex-1 h-[48px] text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center"
+                  >
+                    루틴 추가하기
+                  </button>
+                </div>
               </div>
             </div>
             {addingRoutine && (
