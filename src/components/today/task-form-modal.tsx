@@ -197,13 +197,22 @@ export function TaskFormModal({
               }}
             />
 
-            {/* 제출 버튼 */}
-            <button
-              type="submit"
-              className="w-full h-[48px] text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-            >
-              {isEdit ? "수정 완료하기" : "할 일 추가하기"}
-            </button>
+            {/* 하단 버튼 */}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 h-[48px] text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                className="flex-1 h-[48px] text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                {isEdit ? "수정하기" : "추가하기"}
+              </button>
+            </div>
           </form>
         </div>
       </div>
