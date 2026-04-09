@@ -162,7 +162,7 @@ export function RoutineForm({
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="예: 출근중 10분 책 읽기"
+        placeholder="루틴을 입력하세요"
         required
         autoFocus
         className="w-full h-[48px] px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
