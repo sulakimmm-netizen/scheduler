@@ -102,7 +102,7 @@ export function TaskFormModal({
     return (
       <div className="fixed left-0 right-0 bottom-[96px] z-[100] flex justify-center pointer-events-none">
         <div className="bg-gray-900/80 text-white text-sm font-medium px-6 py-3 rounded-full">
-          추가 완료되었습니다
+          할 일이 추가됐어요
         </div>
       </div>
     );

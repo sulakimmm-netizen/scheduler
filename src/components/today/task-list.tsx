@@ -399,7 +399,7 @@ export function TaskList({
               date={date}
               isCompleted={isCompleted}
               onEdit={() => setEditingRoutine(routine)}
-              onDelete={() => showToast("할 일이 삭제되었습니다")}
+              onDelete={() => showToast("할 일이 삭제됐어요")}
             />
           );
           if (isCompleted) completed.push(node);
@@ -414,7 +414,7 @@ export function TaskList({
                 onDragStart={() => handleDragStart(index)}
                 isDragging={dragIndex === index}
                 onEdit={() => setEditingTask(task)}
-                onDelete={() => showToast("할 일이 삭제되었습니다")}
+                onDelete={() => showToast("할 일이 삭제됐어요")}
               />
             </div>
           );
@@ -442,7 +442,7 @@ export function TaskList({
           task={editingTask}
           onClose={(saved) => {
             setEditingTask(null);
-            if (saved) showToast("할 일이 변경되었습니다");
+            if (saved) showToast("할 일이 수정됐어요");
           }}
         />
       )}
@@ -460,7 +460,7 @@ export function TaskList({
                 routine={editingRoutine}
                 onClose={(saved) => {
                   setEditingRoutine(null);
-                  if (saved) showToast("할 일이 변경되었습니다");
+                  if (saved) showToast("할 일이 수정됐어요");
                 }}
               />
             </div>
