@@ -4,6 +4,7 @@ import { useState } from "react";
 import { TaskFormModal } from "./task-form-modal";
 import { RoutineList } from "@/components/routines/routine-list";
 import { RoutineForm } from "@/components/routines/routine-form";
+import { Toast } from "@/components/ui/toast";
 import type { DailyRoutine } from "@/lib/types";
 
 export function AddTaskForm({
@@ -16,6 +17,7 @@ export function AddTaskForm({
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [routineModalOpen, setRoutineModalOpen] = useState(false);
   const [addingRoutine, setAddingRoutine] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   return (
     <>
@@ -85,13 +87,20 @@ export function AddTaskForm({
                 />
                 <div className="fixed bottom-0 left-0 right-0 z-[70] bg-white rounded-t-2xl shadow-lg">
                   <div className="max-w-2xl mx-auto px-4 pt-4 pb-4">
-                    <RoutineForm onClose={() => setAddingRoutine(false)} />
+                    <RoutineForm onClose={(saved) => {
+                      setAddingRoutine(false);
+                      if (saved) setToastMessage("루틴이 추가됐어요");
+                    }} />
                   </div>
                 </div>
               </>
             )}
           </div>
         </>
+      )}
+
+      {toastMessage && (
+        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
       )}
     </>
   );
