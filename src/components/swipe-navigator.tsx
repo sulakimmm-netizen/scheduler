@@ -36,16 +36,24 @@ export function SwipeNavigator({ children }: { children: React.ReactNode }) {
     const el = containerRef.current;
     if (!el) return;
 
+    function isInsideSwipeableItem(target: EventTarget | null) {
+      if (!(target instanceof HTMLElement)) return false;
+      return !!target.closest("[data-task-index], [data-swipeable]");
+    }
+
+    let ignoreSwipe = false;
+
     function onTouchStart(e: TouchEvent) {
       const touch = e.touches[0];
       touchStartX.current = touch.clientX;
       touchStartY.current = touch.clientY;
       swiped.current = false;
       direction.current = null;
+      ignoreSwipe = isInsideSwipeableItem(e.target);
     }
 
     function onTouchMove(e: TouchEvent) {
-      if (swiped.current) return;
+      if (swiped.current || ignoreSwipe) return;
       const touch = e.touches[0];
       const dx = touch.clientX - touchStartX.current;
       const dy = touch.clientY - touchStartY.current;

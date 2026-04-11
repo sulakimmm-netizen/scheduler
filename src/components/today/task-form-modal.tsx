@@ -25,7 +25,7 @@ export function TaskFormModal({
 }: {
   date: string;
   task?: DailyTask;
-  onClose: () => void;
+  onClose: (saved?: boolean) => void;
 }) {
   const isEdit = !!task;
 
@@ -90,7 +90,7 @@ export function TaskFormModal({
 
     if (isEdit && task) {
       await updateTask(task.id, fd);
-      onClose();
+      onClose(true);
     } else {
       await createTask(fd);
       setShowToast(true);
@@ -100,7 +100,7 @@ export function TaskFormModal({
 
   if (showToast) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed left-0 right-0 bottom-[96px] z-[100] flex justify-center pointer-events-none">
         <div className="bg-gray-900/80 text-white text-sm font-medium px-6 py-3 rounded-full">
           추가 완료되었습니다
         </div>
@@ -110,7 +110,7 @@ export function TaskFormModal({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/30 z-40" onClick={() => onClose()} />
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-lg">
         <div className="max-w-2xl mx-auto px-4 pt-4 pb-4">
           <form onSubmit={handleSubmit} className="space-y-3">
@@ -212,7 +212,7 @@ export function TaskFormModal({
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={() => onClose()}
                 className="w-[112px] h-[48px] text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shrink-0"
               >
                 취소

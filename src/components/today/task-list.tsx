@@ -10,6 +10,7 @@ import {
 } from "@/lib/actions";
 import { useOptimisticToggle } from "@/hooks/use-optimistic-toggle";
 import { TimeBlockBadge } from "@/components/ui/time-block-badge";
+import { Toast } from "@/components/ui/toast";
 import { TaskFormModal } from "./task-form-modal";
 import { RoutineForm } from "@/components/routines/routine-form";
 import type { DailyTask, DailyRoutine, RoutineCompletion } from "@/lib/types";
@@ -19,11 +20,13 @@ function TaskItem({
   onDragStart,
   isDragging,
   onEdit,
+  onDelete,
 }: {
   task: DailyTask;
   onDragStart: () => void;
   isDragging: boolean;
   onEdit: () => void;
+  onDelete: () => void;
 }) {
   const [swipeX, setSwipeX] = useState(0);
   const [swiping, setSwiping] = useState(false);
@@ -41,6 +44,7 @@ function TaskItem({
 
   async function handleDelete() {
     await deleteTask(task.id);
+    onDelete();
   }
 
   function handleTouchStart(e: React.TouchEvent) {
@@ -184,11 +188,13 @@ function RoutineItem({
   date,
   isCompleted,
   onEdit,
+  onDelete,
 }: {
   routine: DailyRoutine;
   date: string;
   isCompleted: boolean;
   onEdit: () => void;
+  onDelete: () => void;
 }) {
   const [swipeX, setSwipeX] = useState(0);
   const [swiping, setSwiping] = useState(false);
@@ -201,6 +207,7 @@ function RoutineItem({
 
   async function handleDelete() {
     await skipRoutineForDate(routine.id, date);
+    onDelete();
   }
 
   function handleTouchStart(e: React.TouchEvent) {
@@ -235,6 +242,7 @@ function RoutineItem({
 
   return (
     <div
+      data-swipeable
       className="relative overflow-hidden rounded-lg"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -317,6 +325,9 @@ export function TaskList({
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [editingTask, setEditingTask] = useState<DailyTask | null>(null);
   const [editingRoutine, setEditingRoutine] = useState<DailyRoutine | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = useCallback((msg: string) => setToastMessage(msg), []);
 
   // Sync with server data
   const prevTasksRef = useRef(tasks);
@@ -388,6 +399,7 @@ export function TaskList({
               date={date}
               isCompleted={isCompleted}
               onEdit={() => setEditingRoutine(routine)}
+              onDelete={() => showToast("할 일이 삭제되었습니다")}
             />
           );
           if (isCompleted) completed.push(node);
@@ -402,6 +414,7 @@ export function TaskList({
                 onDragStart={() => handleDragStart(index)}
                 isDragging={dragIndex === index}
                 onEdit={() => setEditingTask(task)}
+                onDelete={() => showToast("할 일이 삭제되었습니다")}
               />
             </div>
           );
@@ -427,7 +440,10 @@ export function TaskList({
         <TaskFormModal
           date={date}
           task={editingTask}
-          onClose={() => setEditingTask(null)}
+          onClose={(saved) => {
+            setEditingTask(null);
+            if (saved) showToast("할 일이 변경되었습니다");
+          }}
         />
       )}
 
@@ -442,11 +458,19 @@ export function TaskList({
             <div className="max-w-2xl mx-auto">
               <RoutineForm
                 routine={editingRoutine}
-                onClose={() => setEditingRoutine(null)}
+                onClose={(saved) => {
+                  setEditingRoutine(null);
+                  if (saved) showToast("할 일이 변경되었습니다");
+                }}
               />
             </div>
           </div>
         </>
+      )}
+
+      {/* 토스트 */}
+      {toastMessage && (
+        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
       )}
     </section>
   );

@@ -24,7 +24,7 @@ export function RoutineForm({
   onClose,
 }: {
   routine?: DailyRoutine;
-  onClose: () => void;
+  onClose: (saved?: boolean) => void;
 }) {
   const [title, setTitle] = useState(routine?.title ?? "");
   const [days, setDays] = useState<number[]>(routine?.days_of_week ?? [1, 2, 3, 4, 5]);
@@ -69,7 +69,7 @@ export function RoutineForm({
     } else {
       await createRoutine(fd);
     }
-    onClose();
+    onClose(true);
   }
 
   return (
@@ -172,7 +172,7 @@ export function RoutineForm({
       <div className="flex gap-2">
         <button
           type="button"
-          onClick={onClose}
+          onClick={() => onClose()}
           className="w-[112px] h-[48px] text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shrink-0"
         >
           취소
