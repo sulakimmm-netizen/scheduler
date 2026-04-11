@@ -42,8 +42,8 @@ function TaskItem({
     }
   );
 
-  async function handleDelete() {
-    await deleteTask(task.id);
+  function handleDelete() {
+    deleteTask(task.id);
     onDelete();
   }
 
@@ -205,8 +205,8 @@ function RoutineItem({
     await toggleRoutineCompletion(routine.id, date, current);
   });
 
-  async function handleDelete() {
-    await skipRoutineForDate(routine.id, date);
+  function handleDelete() {
+    skipRoutineForDate(routine.id, date);
     onDelete();
   }
 
