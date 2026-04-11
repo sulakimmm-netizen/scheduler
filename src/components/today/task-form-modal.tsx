@@ -51,6 +51,7 @@ export function TaskFormModal({
   const [startTime, setStartTime] = useState(task?.start_time ?? "");
   const [endTime, setEndTime] = useState(task?.end_time ?? "");
   const [title, setTitle] = useState(task?.title ?? "");
+  const [showToast, setShowToast] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -92,9 +93,19 @@ export function TaskFormModal({
       onClose();
     } else {
       await createTask(fd);
-      resetForm();
-      inputRef.current?.focus();
+      setShowToast(true);
+      setTimeout(() => onClose(), 1000);
     }
+  }
+
+  if (showToast) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="bg-gray-900/80 text-white text-sm font-medium px-6 py-3 rounded-full">
+          추가 완료되었습니다
+        </div>
+      </div>
+    );
   }
 
   return (
